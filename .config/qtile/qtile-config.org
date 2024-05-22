@@ -1,0 +1,273 @@
+#+title: Qtile Config File
+#+author: TheLunaticDev
+
+* Imports
+
+#+begin_src python :tangle config.py
+import os
+import subprocess
+
+from libqtile import layout
+from libqtile import hook
+from libqtile import extension
+from libqtile import bar, widget
+from libqtile.config import Screen
+from libqtile.config import EzKey as Key
+from libqtile.config import Click, Drag, Group, Match
+from libqtile.lazy import lazy
+#+end_src
+
+* User Variables
+#+begin_src python :tangle config.py
+app_launcher = 'rofi -show run'
+browser = 'brave'
+gui_editor = "emacsclient -c -a 'emacs' "
+lockscreen = 'betterlockscreen --lock blur'
+password_manager = 'passmenu'
+screenshot_dir = '/home/nano/Pictures/Screenshots/'
+screenshot = f'flameshot full -c -p {screenshot_dir}'
+screenshot_p = f'flameshot gui -c -p {screenshot_dir}'
+terminal = 'alacritty'
+bar_width = 24
+gap_size = 5
+#+end_src
+
+** Color
+
+This variable holds all the color codes for qtile theme.
+The color theme used is called Dracula.
+#+begin_src python :tangle config.py
+color = {
+    'black': '#282a36',
+    'select': '#44475a',
+    'white': '#f8f8f2',
+    'grey': '#6272a4',
+    'cyan': '#8be9fd',
+    'green': '#50fa7b',
+    'orange': '#ffb86c',
+    'pink': '#ff79c6',
+    'purple': '#bd93f9',
+    'red': '#ff5555',
+    'yellow': '#f1fa8c',
+}
+#+end_src
+
+* Groups
+
+#+begin_src python :tangle config.py
+groups = [
+    Group("1", label="1"),
+    Group("2", label="2"),
+    Group("3", label="3"),
+    Group("4", label="4"),
+    Group("5", label="5"),
+    Group("6", label="6"),
+    Group("7", label="7"),
+    Group("8", label="8"),
+    Group("9", label="9"),
+    Group("10", label="0"),
+]
+#+end_src
+
+* Layouts
+
+#+begin_src python :tangle config.py
+layouts = [
+    layout.MonadTall(margin = gap_size),
+    layout.Max(),
+    layout.Floating(),
+]
+#+end_src
+
+* Keys
+
+** Modifier Key Defaults
+
+#+begin_src python :tangle config.py
+modifier_keys = {
+    'M': 'mod4',
+    'A': 'mod1',
+    'S': 'shift',
+    'C': 'control',
+}
+keys = [
+#+end_src
+
+** Key Bindings
+
+*** Window Focus
+
+#+begin_src python :tangle config.py
+    Key('M-h', lazy.layout.left(), desc='Move focus to left'),
+    Key('M-l', lazy.layout.right(), desc='Move focus to right'),
+    Key('M-j', lazy.layout.down(), desc='Move focus down'),
+    Key('M-k', lazy.layout.up(), desc='Move focus up'),
+    Key('M-<space>', lazy.layout.next(), desc='Move window focus to other window'),
+#+end_src
+
+*** Window Functions
+
+#+begin_src python :tangle config.py
+    Key('M-S-c', lazy.window.kill(), desc='Close the focused window'),
+    Key('M-S-f', lazy.window.toggle_floating(), desc='Put the focused window to/from floating mode'),
+    Key('M-f', lazy.window.toggle_fullscreen(), desc='Put the focused window to/from fullscreen mode'),
+#+end_src
+
+*** Layout
+
+**** Layout Switching
+
+#+begin_src python :tangle config.py
+    Key('M-<tab>', lazy.to_next_layout(), desc='Go to next layout'),
+    Key('M-S-<tab>', lazy.prev_layout(), desc='Go back to previous layout'),
+#+end_src
+
+*** Qtile
+
+#+begin_src python :tangle config.py
+    Key('M-S-r', lazy.reload_config(), desc='Reload the Config'),
+    Key('M-C-r', lazy.restart(), desc='Restart Qtile'),
+    Key('M-C-q', lazy.shutdown(), desc='Close the whole Qtile'),
+#+end_src
+
+*** Programs
+
+#+begin_src python :tangle config.py
+    Key('M-r', lazy.spawn(app_launcher) , desc='Spawn the default app launcher'),
+    Key('M-S-b', lazy.spawn(browser), desc='Spawn browser'),
+    Key('M-S-x', lazy.spawn(lockscreen), desc='Lock Screen'),
+    Key('<Print>', lazy.spawn(screenshot), desc='Take fullscreen screenshot and copy it to clipboard'),
+    Key('S-<Print>', lazy.spawn(screenshot_p), desc='Take partial screenshot and copy it to clipboard'),
+    Key('M-S-p', lazy.spawn(password_manager), desc='Start the password manager'),
+    Key('M-<Return>', lazy.spawn(terminal), desc='Launch terminal'),
+    Key('M-S-<Return>', lazy.spawn(gui_editor), desc='Launch a graphical text editor'),
+#+end_src
+
+*** Groups
+
+#+begin_src python :tangle config.py
+  Key('M-1', lazy.group["1"].toscreen()),
+  Key('M-2', lazy.group["2"].toscreen()),
+  Key('M-3', lazy.group["3"].toscreen()),
+  Key('M-4', lazy.group["4"].toscreen()),
+  Key('M-5', lazy.group["5"].toscreen()),
+  Key('M-6', lazy.group["6"].toscreen()),
+  Key('M-7', lazy.group["7"].toscreen()),
+  Key('M-8', lazy.group["8"].toscreen()),
+  Key('M-9', lazy.group["9"].toscreen()),
+  Key('M-0', lazy.group["10"].toscreen()),
+  Key('M-S-1', lazy.window.togroup("1")),
+  Key('M-S-2', lazy.window.togroup("2")),
+  Key('M-S-3', lazy.window.togroup("3")),
+  Key('M-S-4', lazy.window.togroup("4")),
+  Key('M-S-5', lazy.window.togroup("5")),
+  Key('M-S-6', lazy.window.togroup("6")),
+  Key('M-S-7', lazy.window.togroup("7")),
+  Key('M-S-8', lazy.window.togroup("8")),
+  Key('M-S-9', lazy.window.togroup("9")),
+  Key('M-S-0', lazy.window.togroup("10")),
+#+end_src
+
+*** The End
+
+#+begin_src python :tangle config.py
+]
+#+end_src
+
+* Screens
+
+For now this setup is made for use with only one monitor.
+
+#+begin_src python :tangle config.py
+    screens = [
+	Screen(
+	   top=bar.Bar(
+		[
+		    widget.CurrentLayoutIcon(
+			font='Iosevka Nerd Font',
+			highlight_method='block',
+		    ),
+		    widget.GroupBox(
+			font='Iosevka Nerd Font',
+			fontsize=14,
+		    ),
+		    widget.WindowName(
+			font='Iosevka Nerd Font',
+			fontsize=14,
+		    ),
+		    widget.CPU(
+			font='Iosevka Nerd Font',
+			fontsize=14,
+			format='  {load_percent}%',
+			padding=5,
+			foreground='#ea9a97',
+		    ),
+		    widget.Memory(
+			font='Iosevka Nerd Font',
+			fontsize=14,
+			padding=5,
+			format='  {MemPercent}%',
+			foreground='#3e8fb0',
+		    ),
+		    widget.Clock(
+			font='Iosevka Nerd Font',
+			fontsize=14,
+			format="  %Y-%m-%d %a %I:%M %p",
+			foreground='#c4a7e7',
+		    ),
+		    widget.Systray(
+			padding=15,
+		    ),
+		    widget.Volume(
+			emoji=True,
+			emoji_list=['󰝞', '󰕿', '󰖀', '󰕾'],
+			font='Iosevka Nerd Font',
+			fontsize=24,
+			padding=15,
+		    ),
+		],
+		bar_width,
+		background='#232136',
+		border_color='#2a273f',
+		border_width=[3, 3, 3, 3],
+		margin=[3, 10, 3, 10],
+		opacity=0.8,
+	    ),
+	)
+    ]
+#+end_src
+
+* Hooks
+
+** Autostart
+
+Scripts that only run once when qtile is loaded.
+
+#+begin_src python :tangle config.py
+@hook.subscribe.startup_once
+def autostart():
+    home = os.path.expanduser('~/.config/qtile/autostart.sh')
+    subprocess.Popen([home])
+#+end_src
+
+** Restart 
+
+Scripts that run every time qtile is reloaded.
+
+#+begin_src python :tangle config.py
+@hook.subscribe.startup
+def restart():
+    home = os.path.expanduser('~/.config/qtile/restart.sh')
+    subprocess.Popen([home])
+#+end_src
+
+** Auto Float Dialogue
+
+#+begin_src python :tangle config.py
+@hook.subscribe.client_new
+def floating_dialogs(window):
+    dialog = window.window.get_wm_type() == 'dialog'
+    transient = window.window.get_wm_transient_for()
+    if dialog or transient:
+        window.floating = True
+#+end_src
